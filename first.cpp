@@ -30,12 +30,15 @@ int main(int argc, char **argv)
 {
 	DFBSurfaceDescription dsc;
 
-	DFBWindowDescription wdesc;
+	DFBWindowDescription swdesc;
 	IDirectFBWindow *select_window;
 	IDirectFBSurface *select_surface;
 
+	DFBWindowDescription dwdesc;
 	IDirectFBWindow *draw_window;
 	IDirectFBSurface *draw_surface;
+	IDirectFBWindow *draw_window_temp;
+	IDirectFBSurface *draw_surface_tmp;
 
 	DFBCHECK(DirectFBInit(&argc, &argv));
 	DFBCHECK(DirectFBCreate(&dfb));
@@ -86,8 +89,8 @@ int main(int argc, char **argv)
 
 	std::map<int, std::string> title;
 
-	title[0] = "Nome1";
-	title[1] = "Nome2";
+	title[0] = "Free Drawing";
+	title[1] = "Draw Rectangle";
 	title[2] = "Nome3";
 	title[3] = "Nome4";
 	title[4] = "Nome5";
@@ -98,42 +101,63 @@ int main(int argc, char **argv)
 		surface->DrawString(surface, title[i].c_str(), -1, (int)(screen_width * 0.06), (int)(screen_height * 0.25) + (int)(screen_height * 0.07) * i, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
 	}
 
-	//layer->SetBackgroundImage( layer, surface );
+	// Creating evert buffer for mouse and keyboard events
+	IDirectFBEventBuffer *buffer;
+	dfb->CreateInputEventBuffer(dfb, (DFBInputDeviceCapabilities)(DICAPS_KEYS | DICAPS_BUTTONS),
+								DFB_TRUE, &buffer);
 
-	wdesc.flags = (DFBWindowDescriptionFlags)(DWDESC_POSX | DWDESC_POSY |
-											  DWDESC_WIDTH | DWDESC_HEIGHT | DWDESC_CAPS);
-	wdesc.caps = DWCAPS_ALPHACHANNEL;
+	// Creating Window Select
+	swdesc.flags = (DFBWindowDescriptionFlags)(DWDESC_POSX | DWDESC_POSY |
+											   DWDESC_WIDTH | DWDESC_HEIGHT | DWDESC_CAPS);
+	swdesc.caps = DWCAPS_ALPHACHANNEL;
+	swdesc.posx = (int)(screen_width * 0.04);
+	swdesc.posy = (int)(screen_height * 0.23);
+	swdesc.width = (int)(screen_width * 0.17);
+	swdesc.height = (int)(screen_height * 0.069);
 
-	wdesc.posx = (int)(screen_width * 0.04);
-	wdesc.posy = (int)(screen_height * 0.23);
-	wdesc.width = (int)(screen_width * 0.17);
-	wdesc.height = (int)(screen_height * 0.069);
-
-	DFBCHECK(layer->CreateWindow(layer, &wdesc, &select_window));
+	DFBCHECK(layer->CreateWindow(layer, &swdesc, &select_window));
 	select_window->GetSurface(select_window, &select_surface);
 	select_window->SetOpacity(select_window, 0xFF);
 	select_surface->Clear(select_surface, 0x00, 0x00, 0x00, 0x00);
 	select_surface->SetColor(select_surface, 0xFF, 0xFF, 0xFF, 0x55);
-	select_surface->DrawRectangle(select_surface, 0, 0, wdesc.width, wdesc.height);
+	select_surface->DrawRectangle(select_surface, 0, 0, swdesc.width, swdesc.height);
 	select_surface->Flip(select_surface, NULL, (DFBSurfaceFlipFlags)0);
-	DFBWindowID id1;
-	select_window->GetID(select_window,&id1);
-
-	DFBCHECK(surface->Flip(surface, NULL, (DFBSurfaceFlipFlags)0));
-
-	IDirectFBEventBuffer *buffer;
-	dfb->CreateInputEventBuffer(dfb, (DFBInputDeviceCapabilities) 
-								(DICAPS_KEYS | DICAPS_BUTTONS),
-								DFB_TRUE, &buffer);
 	select_window->AttachEventBuffer(select_window, buffer);
 	select_window->RequestFocus(select_window);
 
-	IDirectFBWindow *bg_window = NULL;
+	// Creating Window for drawing surface
+	dwdesc.flags = (DFBWindowDescriptionFlags)(DWDESC_POSX | DWDESC_POSY |
+											   DWDESC_WIDTH | DWDESC_HEIGHT | DWDESC_CAPS);
+	dwdesc.caps = DWCAPS_ALPHACHANNEL;
+	dwdesc.posx = (int)(screen_width * 0.25);
+	dwdesc.posy = (int)(screen_height * 0.2);
+	dwdesc.width = screen_width - (int)(screen_width * 0.25);
+	dwdesc.height = screen_height - (int)(screen_height * 0.2);
+
+	DFBCHECK(layer->CreateWindow(layer, &dwdesc, &draw_window));
+	draw_window->GetSurface(draw_window, &draw_surface);
+	draw_window->SetOpacity(draw_window, 0xFF);
+	draw_surface->Clear(draw_surface, 0x00, 0x00, 0x00, 0x00);
+	draw_surface->SetColor(draw_surface, 0xFF, 0xFF, 0xFF, 0x55);
+	draw_surface->DrawRectangle(draw_surface, 0, 0, dwdesc.width, dwdesc.height);
+	draw_surface->Flip(draw_surface, NULL, (DFBSurfaceFlipFlags)0);
+	draw_window->AttachEventBuffer(draw_window, buffer);
+
+	//Creating temporary surface for drawing
+	DFBCHECK(layer->CreateWindow(layer, &dwdesc, &draw_window_temp));
+	draw_window_temp->GetSurface(draw_window_temp, &draw_surface_tmp);
+
+	// Flip to DFB base surface in the original layer
+	DFBCHECK(surface->Flip(surface, NULL, (DFBSurfaceFlipFlags)0));
 
 	int quit = 0;
 	int position = 1;
 	bool button_right_pressed = 0;
 	int px = 0, py = 0;
+
+	bool rectangleDrawing = 0;
+	int initialRecX = 0, initialRecY = 0;
+	int finalRecX = 0, finalRecY = 0;
 
 	while (!quit)
 	{
@@ -143,82 +167,139 @@ int main(int argc, char **argv)
 		while (buffer->GetEvent(buffer, DFB_EVENT(&evt)) == DFB_OK)
 		{
 			cerr << evt.clazz << " - " << evt.window.window_id << endl;
-			if(evt.clazz == DFEC_INPUT)
+			switch (evt.clazz)
 			{
+			case DFEC_INPUT:
 				switch (evt.input.type)
 				{
-					case DIET_KEYPRESS:{
-						switch (evt.input.key_id)
+				case DIET_KEYPRESS:
+				{
+					switch (evt.input.key_id)
+					{
+					case DIKI_DOWN:
+						if (position < 6)
 						{
-						case DIKI_DOWN:
-							if (position < 6)
-							{
-								select_window->Move(select_window, 0, wdesc.height + 1);
-								position++;
-							}
-							else
-							{
-								select_window->Move(select_window, 0, -wdesc.height * 5 - 5);
-								position = 1;
-							}
-							break;
-						case DIKI_UP:
-							if (position > 1)
-							{
-								select_window->Move(select_window, 0, -wdesc.height - 1);
-								position--;
-							}
-							else
-							{
-								select_window->Move(select_window, 0, +wdesc.height * 5 + 5);
-								position = 6;
-							}
-							break;
-						case DIKI_ESCAPE:
-							quit = 1;
-						default:
-							break;
+							select_window->Move(select_window, 0, swdesc.height + 1);
+							position++;
+						}
+						else
+						{
+							select_window->Move(select_window, 0, -swdesc.height * 5 - 5);
+							position = 1;
 						}
 						break;
-					}
-					case DIET_AXISMOTION:{
-						//If during mouse movement, the left button is pressed
-						if (evt.input.buttons == DIBM_LEFT)
+					case DIKI_UP:
+						if (position > 1)
 						{
-							switch(evt.input.axis)
-							{
-							case DIAI_X:
-
-								px = evt.input.axisabs;
-								break;
-
-							case DIAI_Y:
-								py = evt.input.axisabs;
-								break;
-							default:
-								break;
-								//return;
-							}
-
-							//int px = evt.input.
-							cerr << px << "-" << py << endl;
-							cerr << evt.input.min << "=" << evt.input.max << endl;
+							select_window->Move(select_window, 0, -swdesc.height - 1);
+							position--;
 						}
-						
+						else
+						{
+							select_window->Move(select_window, 0, +swdesc.height * 5 + 5);
+							position = 6;
+						}
+						break;
+					case DIKI_ESCAPE:
+					{
+						quit = 1;
+						break;
 					}
 					default:
 						break;
+					}
+					break;
 				}
+				case DIET_AXISMOTION:
+				{
+					//If during mouse movement, the left button is pressed
+					if (evt.input.buttons == DIBM_LEFT)
+					{
+						switch (evt.input.axis)
+						{
+						case DIAI_X:
+
+							px = evt.input.axisabs;
+							break;
+
+						case DIAI_Y:
+							py = evt.input.axisabs;
+							break;
+						default:
+							break;
+							//return;
+						}
+
+						//int px = evt.input.
+						cerr << px << "-" << py << endl;
+					}
+				}
+				default:
+					break;
+				}
+			case DFEC_WINDOW:
+				if (evt.window.type == DWET_BUTTONUP && evt.window.button == DIBI_LEFT)
+				{
+					draw_surface_tmp->Blit(draw_surface_tmp,draw_surface,NULL,0,0);
+				}
+				else if (evt.window.buttons == DIBM_LEFT && evt.window.window_id == 3 && position == 1)
+				{
+					DFBCHECK(draw_surface->SetColor(draw_surface, 0xFF, 0x00, 0x00, 0xff));
+					DFBCHECK(draw_surface->FillRectangle(draw_surface, evt.window.x, evt.window.y, 10, 10));
+					draw_surface->Flip(draw_surface, NULL, (DFBSurfaceFlipFlags)0);
+				}
+				else if (evt.window.type == DWET_BUTTONDOWN && evt.window.buttons == DIBM_LEFT && evt.window.window_id == 3 && position == 2)
+				{
+					rectangleDrawing = true;
+					initialRecX = evt.window.x;
+					initialRecY = evt.window.y;
+				}
+				else if (evt.window.type == DWET_MOTION &&
+						 evt.window.buttons == DIBM_LEFT &&
+						 evt.window.window_id == 3 &&
+						 position == 2 &&
+						 rectangleDrawing){
+					
+					draw_surface->Blit(draw_surface,draw_surface_tmp,NULL,0,0);
+					draw_surface->Flip(draw_surface, NULL, (DFBSurfaceFlipFlags)0);
+					draw_surface->DrawRectangle(draw_surface, initialRecX, initialRecY, 
+												abs(initialRecX - evt.window.x), abs(initialRecY - evt.window.y));
+					draw_surface->Flip(draw_surface, NULL, (DFBSurfaceFlipFlags)0);
+
+				}
+				else if (evt.window.type == DWET_BUTTONUP &&
+						 evt.window.button == DIBI_LEFT &&
+						 position == 2 &&
+						 rectangleDrawing){
+
+					rectangleDrawing = false;
+					finalRecX = evt.window.x;
+					finalRecY = evt.window.y;
+
+					draw_surface->DrawRectangle(draw_surface, initialRecX, initialRecY, 
+												initialRecX - finalRecX, initialRecY - finalRecY);
+
+					draw_surface_tmp->Blit(draw_surface_tmp,draw_surface,NULL,0,0);
+					draw_surface->Flip(draw_surface, NULL, (DFBSurfaceFlipFlags)0);
+				}
+
+			default:
+				break;
 			}
 		}
 	}
 
+	//test
 	//getchar();
 
 	buffer->Release(buffer);
 	surface->Release(surface);
 	select_surface->Release(select_surface);
 	select_window->Release(select_window);
+	draw_surface->Release(draw_surface);
+	draw_window->Release(draw_window);
+	draw_surface_tmp->Release(draw_surface_tmp);
+	draw_window_temp->Release(draw_window_temp);
 	fontbig->Release(fontbig);
 	fontsmall->Release(fontsmall);
 	layer->Release(layer);
