@@ -1,0 +1,12 @@
+Compile DirectFB examples../
+
+mkdir build install
+cd build
+../configure --prefix=$(pwd)/../install
+make -j16
+make install
+
+g++ first.cpp -I/usr/include/directfb -o first `pkg-config --libs directfb`
+
+DirectFB file configuration
+http://www.linux-tutorial.info/modules.php?name=ManPage&sec=5&manpage=directfbrc
