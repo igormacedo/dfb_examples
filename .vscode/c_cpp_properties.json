@@ -37,6 +37,7 @@
                 "/usr/include",
                 "/usr/include/directfb",
                 "${workspaceFolder}/secondexample",
+                "${workspaceFolder}/modularexample",
                 "${workspaceFolder}/modularexample"
             ],
             "defines": [],

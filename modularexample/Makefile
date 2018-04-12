@@ -1,8 +1,8 @@
 # Define required macros here
 SHELL = /bin/sh
 
-OBJS = window.o
-CXXFLAGS = -Wall -g
+OBJS = window.o event.o canvas.o
+CXXFLAGS = -Wall -g -std=c++11
 CXX = g++
 INCLUDES = `pkg-config --cflags directfb`
 LIBS = `pkg-config --libs directfb`

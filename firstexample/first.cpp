@@ -122,7 +122,7 @@ int main(int argc, char **argv)
 	select_surface->SetColor(select_surface, 0xFF, 0xFF, 0xFF, 0x55);
 	select_surface->DrawRectangle(select_surface, 0, 0, swdesc.width, swdesc.height);
 	select_surface->Flip(select_surface, NULL, (DFBSurfaceFlipFlags)0);
-	select_window->AttachEventBuffer(select_window, buffer);
+	//select_window->AttachEventBuffer(select_window, buffer);
 	select_window->RequestFocus(select_window);
 
 	// Creating Window for drawing surface

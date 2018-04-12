@@ -2,7 +2,8 @@
 #define CANVAS_H
 
 class Canvas{
-
+    public:
+        void finalize();
 };
 
 #endif

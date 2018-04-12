@@ -4,7 +4,10 @@
 #include <directfb.h>
 #include <map>
 #include <string>
+#include <iostream>
 #include "tool.h"
+#include "canvas.h"
+#include "event.h"
 
 #define DFBCHECK(x...)                                       \
 {                                                            \
@@ -22,17 +25,28 @@ class Window{
         IDirectFB *dfb = NULL;
         IDirectFBDisplayLayer *layer = NULL;
         IDirectFBSurface *surface = NULL;
-        std::map<std::string, Tool> toolsMap;
+
+        IDirectFBWindow *select_window = NULL;
+	    IDirectFBSurface *select_surface = NULL;
+
+        std::map<int, Tool*> toolsMap;
+        Canvas canvas;
+        EventHandler event;
+        Tool *currentTool;
+        int position = 1;
+
+        void createMenuSelector();
+        void updateMenuSelectorPosition(bool up);
+        void reloadToolMenu();
+        void addTool(Tool *tool);
 
     public:
         int screen_width;
 	    int screen_height;
 
         void initiate(int *argc, char ***argv);
-        void runCanvas();
+        void runWindow();
         void finalize();
-        void addTool(Tool tool);
-        void reloadToolMenu();
 };
 
 #endif

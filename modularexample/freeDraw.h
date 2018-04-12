@@ -2,12 +2,17 @@
 #define FREEDRAW_H
 
 #include "tool.h"
+#include "canvas.h"
+#include "event.h"
 
 class FreeDraw: public Tool {
-   public:
-      int Draw() {
-         return 10; 
-      }
+   private:
+    public:
+        std::string name;
+
+        ~FreeDraw();
+        void drawAt(Canvas *canvas, EventHandler *evt);
+        //void finalize(); 
 };
 
 

@@ -1,14 +1,9 @@
-#ifndef FREEDRAW_H
-#define FREEDRAW_H
+#include "freeDraw.h"
 
-#include "tool.h"
+FreeDraw::~FreeDraw(){
 
-class FreeDraw: public Tool {
-   public:
-      int Draw() {
-         return 10; 
-      }
-};
+}
 
+void FreeDraw::drawAt(Canvas *canvas, EventHandler *evt){
 
-#endif // FREEDRAW_H
+}
