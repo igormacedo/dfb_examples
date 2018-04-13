@@ -22,6 +22,11 @@ enum MouseButton{
     BUTTON_LEFT = 0x02
 };
 
+enum EventStatus{
+    STATUS_HAS_EVENT = 0x01,
+    STATUS_EMPTY = 0x02
+};
+
 #include <iostream>
 #include "directfb.h"
 
@@ -36,7 +41,7 @@ class EventHandler{
         IDirectFBEventBuffer *buffer;
 
         void createEventHandler(IDirectFB *dfb);
-        void captureEventTimeout();
+        EventStatus captureEventTimeout();
         void finalize();
 };
 

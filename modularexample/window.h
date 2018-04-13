@@ -37,14 +37,14 @@ class Window{
 
         void createMenuSelector();
         void updateMenuSelectorPosition(bool up);
-        void reloadToolMenu();
-        void addTool(Tool *tool);
 
     public:
         int screen_width;
 	    int screen_height;
 
         void initiate(int *argc, char ***argv);
+        void addTool(Tool *tool);
+        void reloadToolMenu();
         void runWindow();
         void finalize();
 };

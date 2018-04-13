@@ -8,12 +8,11 @@
 class FreeDraw: public Tool {
    private:
     public:
-        std::string name;
 
+        FreeDraw(std::string str_name);
         ~FreeDraw();
         void drawAt(Canvas *canvas, EventHandler *evt);
-        //void finalize(); 
+        //void finalize();
 };
-
 
 #endif // FREEDRAW_H

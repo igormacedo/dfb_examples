@@ -10,7 +10,7 @@ class Tool{
     public:
         std::string name;
 
-        virtual ~Tool() = 0;  // forces implementation of the destrutor 
+        virtual ~Tool() {};  // forces implementation of the destrutor 
         virtual void drawAt(Canvas *canvas, EventHandler *evt) = 0; //pure virtual method, cant instantiate class
         //virtual void finalize() = 0; 
 };

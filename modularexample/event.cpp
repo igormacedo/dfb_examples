@@ -6,19 +6,23 @@ void EventHandler::createEventHandler(IDirectFB *dfb){
 								DFB_TRUE, &this->buffer);
 }
 
-void EventHandler::captureEventTimeout(){
+EventStatus EventHandler::captureEventTimeout(){
 
     DFBEvent evt;
-
-    std::cerr << "windows is before Timeout" << std::endl;
-
 	buffer->WaitForEventWithTimeout(buffer, 0, 10);
 
-    std::cerr << "windows is after Timeout" << std::endl;
+    EventStatus evt_status;
+    if(buffer->HasEvent(buffer) == DFB_OK)
+    {
+        evt_status = EventStatus::STATUS_HAS_EVENT;
+    }
+    else{
+        this->type = EventType::UNKOWN;
+        evt_status = EventStatus::STATUS_EMPTY;
+    }
 
     if (buffer->GetEvent(buffer, DFB_EVENT(&evt)) == DFB_OK)
     {
-        std::cerr << "windows is loopingInSwicth" << std::endl;
         switch(evt.clazz){
             case DFEC_INPUT:
                 switch (evt.input.type)
@@ -50,7 +54,9 @@ void EventHandler::captureEventTimeout(){
 				}
                 }
         }
-    }
+    }      
+
+    return evt_status;
 }
 
 void EventHandler::finalize(){
