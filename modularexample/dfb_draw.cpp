@@ -3,16 +3,17 @@
 
 // using namespace std;
 
-#include "window.h"
 #include "freeDraw.h"
+#include "window.h"
 
 // #define LOG() \
 //     cout << __FILE__ << ": line " << __LINE__ << endl;
 
-int main(int argc, char **argv){
+int main(int argc, char** argv)
+{
 
     Window win;
-    win.initiate(&argc,&argv);
+    win.initiate(&argc, &argv);
 
     FreeDraw fd_tool(std::string("Free Draw"));
     win.addTool(&fd_tool);
