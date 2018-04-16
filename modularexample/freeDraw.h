@@ -1,12 +1,13 @@
 #ifndef FREEDRAW_H
 #define FREEDRAW_H
 
-#include "canvas.h"
-#include "event.h"
 #include "tool.h"
 #include <iostream>
 
 using namespace std;
+
+class Canvas;
+class EventHandler;
 
 class FreeDraw : public Tool {
 private:

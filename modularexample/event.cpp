@@ -13,20 +13,21 @@ EventStatus EventHandler::captureEventTimeout()
 
     EventStatus evt_status;
     if (buffer->HasEvent(buffer) == DFB_OK) {
-        evt_status = EventStatus::STATUS_HAS_EVENT;
+        evt_status = STATUS_HAS_EVENT;
     } else {
-        this->type = EventType::UNKOWN;
-        evt_status = EventStatus::STATUS_EMPTY;
+        this->type = UNKOWN;
+        evt_status = STATUS_EMPTY;
+        evt_status = STATUS_EMPTY;
     }
 
     if (buffer->GetEvent(buffer, DFB_EVENT(&evt)) == DFB_OK) {
-        evt_status = EventStatus::STATUS_HAS_EVENT;
+        evt_status = STATUS_HAS_EVENT;
         switch (evt.clazz) {
         case DFEC_INPUT:
             switch (evt.input.type) {
             case DIET_KEYPRESS: {
-                this->type = EventType::KEYBOARD_KEYDOWN;
-                this->button = MouseButton::BUTTON_UNKNOWN;
+                this->type = KEYBOARD_KEYDOWN;
+                this->button = BUTTON_UNKNOWN;
 
                 switch (evt.input.key_id) {
                 case DIKI_DOWN: {
@@ -48,23 +49,23 @@ EventStatus EventHandler::captureEventTimeout()
                 break;
             }
             case DIET_BUTTONPRESS: {
-                this->type = EventType::MOUSE_BUTTONDOWN;
-                this->key = KeyboardKey::KEY_UNKNOWN;
+                this->type = MOUSE_BUTTONDOWN;
+                this->key = KEY_UNKNOWN;
                 if (evt.input.button == DIBI_LEFT) {
-                    this->button = MouseButton::BUTTON_LEFT;
+                    this->button = BUTTON_LEFT;
                 }
                 break;
             }
             case DIET_BUTTONRELEASE: {
-                this->type = EventType::MOUSE_BUTTONUP;
-                this->key = KeyboardKey::KEY_UNKNOWN;
+                this->type = MOUSE_BUTTONUP;
+                this->key = KEY_UNKNOWN;
                 if (evt.input.button == DIBI_LEFT) {
-                    this->button = MouseButton::BUTTON_UNKNOWN;
+                    this->button = BUTTON_UNKNOWN;
                 }
                 break;
             }
             case DIET_AXISMOTION: {
-                this->type = EventType::MOUSE_MOTION;
+                this->type = MOUSE_MOTION;
 
                 switch (evt.input.axis) {
                 case DIAI_X: {

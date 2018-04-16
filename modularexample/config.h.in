@@ -1,0 +1,1 @@
+#cmakedefine FONT_PATH @FONT_PATH@

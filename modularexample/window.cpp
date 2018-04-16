@@ -1,3 +1,5 @@
+#include "config.h"
+
 #include "window.h"
 
 void Window::initiate(int* argc, char*** argv)
@@ -31,7 +33,7 @@ void Window::initiate(int* argc, char*** argv)
     DFBFontDescription desc;
     desc.flags = DFDESC_HEIGHT;
     desc.height = (int)(screen_height * 0.05);
-    DFBCHECK(dfb->CreateFont(dfb, "decker.ttf", &desc, &fontbig));
+    DFBCHECK(dfb->CreateFont(dfb, FONT_PATH, &desc, &fontbig));
 
     DFBCHECK(surface->SetFont(surface, fontbig));
     surface->SetColor(surface, 0xff, 0xff, 0xff, 0xff);
@@ -165,7 +167,7 @@ void Window::reloadToolMenu()
     desc.flags = DFDESC_HEIGHT;
     desc.height = (int)(screen_height * 0.02);
 
-    DFBCHECK(dfb->CreateFont(dfb, "decker.ttf", &desc, &fontsmall));
+    DFBCHECK(dfb->CreateFont(dfb, FONT_PATH, &desc, &fontsmall));
     DFBCHECK(surface->SetFont(surface, fontsmall));
 
     // Side Rectangle // Reloading Side rectangle with new tool

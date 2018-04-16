@@ -4,6 +4,7 @@
 // using namespace std;
 
 #include "freeDraw.h"
+#include "squareDraw.h"
 #include "window.h"
 
 // #define LOG() \
@@ -11,13 +12,13 @@
 
 int main(int argc, char** argv)
 {
-
     Window win;
     win.initiate(&argc, &argv);
 
     FreeDraw fd_tool(std::string("Free Draw"));
     win.addTool(&fd_tool);
-    win.addTool(&fd_tool);
+    SquareDraw sd_tool(std::string("Draw Square"));
+    win.addTool(&sd_tool);
     win.reloadToolMenu();
 
     win.runWindow();
