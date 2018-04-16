@@ -4,6 +4,9 @@
 #include "canvas.h"
 #include "event.h"
 #include "tool.h"
+#include <iostream>
+
+using namespace std;
 
 class FreeDraw : public Tool {
 private:

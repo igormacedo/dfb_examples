@@ -7,7 +7,6 @@ class Canvas {
 private:
     IDirectFBWindow* draw_window;
     IDirectFBWindow* draw_window_temp;
-    int px, py, height, width;
 
     IDirectFB* dfb;
     IDirectFBSurface* surface;
@@ -15,6 +14,7 @@ private:
 public:
     IDirectFBSurface* draw_surface;
     IDirectFBSurface* draw_surface_tmp;
+    int px, py, height, width;
 
     Canvas(IDirectFB* dfb, IDirectFBSurface* surface);
     void initiateCanvas(int px, int py, int h, int w);

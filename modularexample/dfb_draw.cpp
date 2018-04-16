@@ -18,12 +18,6 @@ int main(int argc, char** argv)
     FreeDraw fd_tool(std::string("Free Draw"));
     win.addTool(&fd_tool);
     win.addTool(&fd_tool);
-    win.addTool(&fd_tool);
-    win.addTool(&fd_tool);
-    win.addTool(&fd_tool);
-    win.addTool(&fd_tool);
-    win.addTool(&fd_tool);
-
     win.reloadToolMenu();
 
     win.runWindow();

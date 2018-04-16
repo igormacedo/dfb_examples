@@ -98,6 +98,9 @@ void Window::createMenuSelector()
 
     if (toolsMap.size() == 0)
         return;
+    else {
+        currentTool = toolsMap[0];
+    }
 
     DFBWindowDescription swdesc;
 
@@ -128,17 +131,21 @@ void Window::updateMenuSelectorPosition(bool up)
         if (position > 1) {
             select_window->Move(select_window, 0, -height - 1);
             position--;
+            currentTool = toolsMap[position - 1];
         } else {
             select_window->Move(select_window, 0, +height * (toolsMap.size() - 1) + (toolsMap.size() - 1));
             position = toolsMap.size();
+            currentTool = toolsMap[position - 1];
         }
     } else {
         if (position < toolsMap.size()) {
             select_window->Move(select_window, 0, height + 1);
             position++;
+            currentTool = toolsMap[position - 1];
         } else {
             select_window->Move(select_window, 0, -height * (toolsMap.size() - 1) - (toolsMap.size() - 1));
             position = 1;
+            currentTool = toolsMap[position - 1];
         }
     }
 }

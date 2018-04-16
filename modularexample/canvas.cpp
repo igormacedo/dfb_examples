@@ -8,7 +8,6 @@ Canvas::Canvas(IDirectFB* dfb, IDirectFBSurface* surface)
 
 void Canvas::initiateCanvas(int px, int py, int h, int w)
 {
-
     this->px = px;
     this->py = py;
     this->height = h;

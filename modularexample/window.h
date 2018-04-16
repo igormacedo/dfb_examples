@@ -9,6 +9,8 @@
 #include <map>
 #include <string>
 
+using namespace std;
+
 #define DFBCHECK(x...)                                           \
     {                                                            \
         DFBResult err = x;                                       \

@@ -2,14 +2,12 @@
 
 void EventHandler::createEventHandler(IDirectFB* dfb)
 {
-
     dfb->CreateInputEventBuffer(dfb, (DFBInputDeviceCapabilities)(DICAPS_KEYS | DICAPS_BUTTONS),
         DFB_TRUE, &this->buffer);
 }
 
 EventStatus EventHandler::captureEventTimeout()
 {
-
     DFBEvent evt;
     buffer->WaitForEventWithTimeout(buffer, 0, 10);
 
@@ -22,6 +20,7 @@ EventStatus EventHandler::captureEventTimeout()
     }
 
     if (buffer->GetEvent(buffer, DFB_EVENT(&evt)) == DFB_OK) {
+        evt_status = EventStatus::STATUS_HAS_EVENT;
         switch (evt.clazz) {
         case DFEC_INPUT:
             switch (evt.input.type) {
@@ -51,28 +50,38 @@ EventStatus EventHandler::captureEventTimeout()
             case DIET_BUTTONPRESS: {
                 this->type = EventType::MOUSE_BUTTONDOWN;
                 this->key = KeyboardKey::KEY_UNKNOWN;
+                if (evt.input.button == DIBI_LEFT) {
+                    this->button = MouseButton::BUTTON_LEFT;
+                }
+                break;
+            }
+            case DIET_BUTTONRELEASE: {
+                this->type = EventType::MOUSE_BUTTONUP;
+                this->key = KeyboardKey::KEY_UNKNOWN;
+                if (evt.input.button == DIBI_LEFT) {
+                    this->button = MouseButton::BUTTON_UNKNOWN;
+                }
                 break;
             }
             case DIET_AXISMOTION: {
-                //If during mouse movement, the left button is pressed
-                if (evt.input.buttons == DIBM_LEFT) {
-                    switch (evt.input.axis) {
-                    case DIAI_X: {
-                        mouse_px = evt.input.axisabs;
-                        break;
-                    }
-                    case DIAI_Y: {
-                        mouse_py = evt.input.axisabs;
-                        break;
-                    }
-                    default:
-                        break;
-                    }
+                this->type = EventType::MOUSE_MOTION;
 
-                    std::cerr << mouse_px << "-" << mouse_py << std::endl;
+                switch (evt.input.axis) {
+                case DIAI_X: {
+                    mouse_px = evt.input.axisabs;
+                    break;
                 }
+                case DIAI_Y: {
+                    mouse_py = evt.input.axisabs;
+                    break;
+                }
+                default:
+                    break;
+                }
+                break;
             }
             }
+            break;
         }
     }
 
