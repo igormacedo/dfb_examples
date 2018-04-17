@@ -220,14 +220,17 @@ int main(int argc, char** argv)
             case DFEC_WINDOW:
                 if (evt.window.type == DWET_BUTTONUP && evt.window.button == DIBI_LEFT) {
                     draw_surface_tmp->Blit(draw_surface_tmp, draw_surface, NULL, 0, 0);
+
                 } else if (evt.window.buttons == DIBM_LEFT && evt.window.window_id == 3 && position == 1) {
                     DFBCHECK(draw_surface->SetColor(draw_surface, 0xFF, 0x00, 0x00, 0xff));
                     DFBCHECK(draw_surface->FillRectangle(draw_surface, evt.window.x, evt.window.y, 10, 10));
                     draw_surface->Flip(draw_surface, NULL, (DFBSurfaceFlipFlags)0);
+
                 } else if (evt.window.type == DWET_BUTTONDOWN && evt.window.buttons == DIBM_LEFT && evt.window.window_id == 3 && position == 2) {
                     rectangleDrawing = true;
                     initialRecX = evt.window.x;
                     initialRecY = evt.window.y;
+
                 } else if (evt.window.type == DWET_MOTION && evt.window.buttons == DIBM_LEFT && evt.window.window_id == 3 && position == 2 && rectangleDrawing) {
 
                     draw_surface->Blit(draw_surface, draw_surface_tmp, NULL, 0, 0);
